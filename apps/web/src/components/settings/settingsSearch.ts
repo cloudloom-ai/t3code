@@ -170,6 +170,20 @@ export const SETTINGS_SEARCH_ITEMS = [
     searchTerms: ["disk storage browser screenshots captures rotated logs cleanup retention"],
   },
   {
+    id: "training-capture",
+    title: "Capture events for training",
+    to: "/settings/general",
+    scope: "environment-defaults",
+    searchTerms: ["training data capture events export dataset model fine-tuning"],
+  },
+  {
+    id: "training-capture-directory",
+    title: "Training capture folder",
+    to: "/settings/general",
+    scope: "environment-defaults",
+    searchTerms: ["training capture folder directory location dataset export"],
+  },
+  {
     id: "project-defaults",
     title: "Project defaults and overrides",
     to: "/settings/general",

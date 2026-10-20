@@ -78,6 +78,14 @@ describe("storage cleanup settings", () => {
     });
   });
 
+  it("keeps training capture disabled by default and accepts partial patches", () => {
+    expect(decodeServerSettings({}).trainingCapture).toEqual({ enabled: false, directory: "" });
+    expect(DEFAULT_SERVER_SETTINGS.trainingCapture).toEqual({ enabled: false, directory: "" });
+    expect(decodeServerSettingsPatch({ trainingCapture: { enabled: true } })).toEqual({
+      trainingCapture: { enabled: true },
+    });
+  });
+
   it("accepts partial custom patches but requires complete stored project rules", () => {
     expect(
       decodeServerSettingsPatch({

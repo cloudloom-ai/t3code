@@ -3117,6 +3117,45 @@ export function GeneralSettingsPanel() {
         ) : null}
       </SettingsSection>
 
+      <SettingsSection id="training-capture" title="Training data">
+        <SettingsRow
+          {...searchableSetting("training-capture")}
+          serverScoped
+          settingKeys={["trainingCapture"]}
+          description="Append every orchestration event on this environment to per-thread capture files, one JSON line per event, including pull request links, checkpoints, and model choices. The first enable copies the full event history."
+          control={
+            <Switch
+              aria-label="Capture events for training"
+              checked={settings.trainingCapture.enabled}
+              onCheckedChange={(enabled) => updateSettings({ trainingCapture: { enabled } })}
+            />
+          }
+        />
+        {settings.trainingCapture.enabled && (
+          <SettingsRow
+            {...searchableSetting("training-capture-directory")}
+            serverScoped
+            settingKeys={["trainingCapture"]}
+            description="Folder on the environment where capture files are written, such as ~/t3-training. Leave empty to use the environment's T3 state folder. Switching folders starts a fresh capture there; existing files are kept."
+            control={
+              <Input
+                key={settings.trainingCapture.directory}
+                aria-label="Training capture folder"
+                autoCapitalize="none"
+                spellCheck={false}
+                placeholder="Default"
+                defaultValue={settings.trainingCapture.directory}
+                onBlur={(event) => {
+                  const directory = event.target.value.trim();
+                  if (directory !== settings.trainingCapture.directory)
+                    updateSettings({ trainingCapture: { directory } });
+                }}
+              />
+            }
+          />
+        )}
+      </SettingsSection>
+
       <SettingsSection id="text-generation" title="Text generation">
         <SettingsRow
           serverScoped

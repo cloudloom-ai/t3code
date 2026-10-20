@@ -71,6 +71,18 @@ describe("serverSettings helpers", () => {
       logsAfterDays: 30,
     });
   });
+
+  it("changes one training capture field without resetting the other", () => {
+    const configured = applyServerSettingsPatch(DEFAULT_SERVER_SETTINGS, {
+      trainingCapture: { enabled: true, directory: "/captures" },
+    });
+    expect(
+      applyServerSettingsPatch(configured, { trainingCapture: { enabled: false } }).trainingCapture,
+    ).toEqual({ enabled: false, directory: "/captures" });
+    expect(
+      applyServerSettingsPatch(configured, { trainingCapture: { directory: "" } }).trainingCapture,
+    ).toEqual({ enabled: true, directory: "" });
+  });
   it("replaces a source control host's patched field so a cleared account pin does not survive", () => {
     const pinned = applyServerSettingsPatch(DEFAULT_SERVER_SETTINGS, {
       sourceControlHosts: {

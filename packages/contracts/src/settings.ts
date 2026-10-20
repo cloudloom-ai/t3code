@@ -1037,6 +1037,13 @@ export const StorageCleanupSettings = Schema.Struct({
 });
 export type StorageCleanupSettings = typeof StorageCleanupSettings.Type;
 
+export const TrainingCaptureSettings = Schema.Struct({
+  enabled: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
+  /** Empty uses the environment's default location under its T3 state directory. */
+  directory: TrimmedString.pipe(Schema.withDecodingDefault(Effect.succeed(""))),
+});
+export type TrainingCaptureSettings = typeof TrainingCaptureSettings.Type;
+
 export const ServerSettings = Schema.Struct({
   // Null means no client has migrated this preference yet; an empty value is
   // authoritative so another device cannot resurrect cleared preferences.
@@ -1047,6 +1054,9 @@ export const ServerSettings = Schema.Struct({
   worktreeCleanup: WorktreeCleanup.pipe(Schema.withDecodingDefault(Effect.succeed(null))),
   storageCleanup: StorageCleanupSettings.pipe(
     Schema.withDecodingDefault(Effect.succeed(Schema.decodeSync(StorageCleanupSettings)({}))),
+  ),
+  trainingCapture: TrainingCaptureSettings.pipe(
+    Schema.withDecodingDefault(Effect.succeed(Schema.decodeSync(TrainingCaptureSettings)({}))),
   ),
 
   worktreesDirectory: TrimmedString.pipe(Schema.withDecodingDefault(Effect.succeed(""))),
@@ -1375,6 +1385,12 @@ export const ServerSettingsPatch = Schema.Struct({
       worktreeUnchanged: Schema.optionalKey(Schema.Boolean),
       browserArtifactsAfterDays: Schema.optionalKey(StorageRetentionDays),
       logsAfterDays: Schema.optionalKey(StorageRetentionDays),
+    }),
+  ),
+  trainingCapture: Schema.optionalKey(
+    Schema.Struct({
+      enabled: Schema.optionalKey(Schema.Boolean),
+      directory: Schema.optionalKey(TrimmedString),
     }),
   ),
   worktreesDirectory: Schema.optionalKey(TrimmedString),
