@@ -392,3 +392,9 @@ describe("formatGeneratedBranchName", () => {
     ).toBe(branch);
   });
 });
+
+it("canonicalizes legacy Origin remotes", () => {
+  expect(normalizeGitRemoteUrl("https://origin.cursor.com/git/Acme/Repo.git")).toBe(
+    "origin.cursor.com/acme/repo",
+  );
+});

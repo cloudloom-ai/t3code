@@ -28,6 +28,11 @@ export function parseChangeRequestUrl(targetUrl: string): ChangeRequestLink | nu
   if (url.protocol !== "https:" && url.protocol !== "http:") return null;
   const host = url.hostname.toLowerCase();
 
+  if (host === "cursor.com") {
+    const match = /^\/codebase\/([^/]+\/[^/]+)\/pull\/(\d+)(?:\/|$)/u.exec(url.pathname);
+    return claim("origin.cursor.com", match);
+  }
+
   if (host === "git.cafe" || host === "staging.git.cafe") {
     const match = /^\/([^/]+\/[^/]+)\/pulls\/(\d+)(?:\/|$)/u.exec(url.pathname);
     return claim(host, match);
@@ -70,6 +75,8 @@ export function changeRequestUrlFor(
   remoteUrl?: string,
 ): string | null {
   switch (kind) {
+    case "cursor-origin":
+      return `https://cursor.com/codebase/${repository}/pull/${number}`;
     case "github":
       return `https://${host}/${repository}/pull/${number}`;
     case "gitcafe":

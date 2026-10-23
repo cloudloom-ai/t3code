@@ -10,6 +10,7 @@ describe("sourceControlClients", () => {
 
   it("gives a change request URL to the first host whose shape it has", () => {
     const kindOf = (url: string) => sourceControlClients.findByChangeRequestUrl(url)?.kind;
+    expect(kindOf("https://cursor.com/codebase/acme/web/pull/7")).toBe("cursor-origin");
     expect(kindOf("https://git.cafe/acme/web/pulls/7")).toBe("gitcafe");
     expect(kindOf("https://codeberg.org/acme/web/pulls/7")).toBe("forgejo");
   });

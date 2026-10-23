@@ -96,6 +96,21 @@ az extension add --name azure-devops
 az login
 ```
 
+### Cursor Origin
+
+Install the [Origin CLI](https://cursor.com/docs/api/origin) on the machine running your T3 Code
+server, then run `origin auth login` and `origin auth setup-git`. Rescan in
+**Settings → Source Control** after signing in.
+
+T3 recognizes Origin HTTPS remotes, including the older `/git/owner/repo.git` format. You can
+clone existing repositories, create pull requests, and check them out. The Pull Requests view
+supports Origin PR lists, details, diffs, checks, comments, reviews, labels, and merge or squash
+merges. You can also close and reopen PRs, switch draft status, and enable or disable auto-merge.
+
+Create repositories and manage stacks in Cursor Origin. Merging a stacked child PR there can merge
+its parent PRs too, so T3 leaves that action to Origin. Reviewer discovery, repository publishing,
+branch updates, and PR reactions are not available in T3 for Origin.
+
 ### GitCafe
 
 Install the GitCafe CLI and sign in:

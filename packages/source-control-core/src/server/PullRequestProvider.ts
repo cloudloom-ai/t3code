@@ -144,6 +144,7 @@ export interface ProviderChangeRequestPage {
    * may need to count malformed raw rows it consumed too.
    */
   readonly cursorAdvance?: number;
+  readonly nextPageToken?: string;
   readonly continues: boolean;
 }
 
@@ -155,6 +156,7 @@ export interface ProviderListCursor {
    */
   readonly updatedBefore: string;
   readonly delivered: number;
+  readonly pageToken?: string;
 }
 
 export interface ProviderBatchedChangeRequest extends ProviderChangeRequest {

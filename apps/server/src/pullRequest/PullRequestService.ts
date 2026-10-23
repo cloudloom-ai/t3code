@@ -333,16 +333,23 @@ interface ListCursor extends ProviderListCursor {
 }
 
 const LIST_CURSOR_PATTERN =
-  /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(?:Z|[+-]\d{2}:\d{2}))\|(\d{1,9})\|(\d{1,9}(?:,\d{1,9})*)?$/;
+  /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(?:Z|[+-]\d{2}:\d{2}))\|(\d{1,9})\|(\d{1,9}(?:,\d{1,9})*)?(?:\|([^|]+))?$/;
 
 function parseListCursor(raw: string): ListCursor | null {
   const match = LIST_CURSOR_PATTERN.exec(raw);
   if (match === null) return null;
   const seenAt = match[3];
+  let pageToken: string | undefined;
+  try {
+    pageToken = match[4] === undefined ? undefined : decodeURIComponent(match[4]);
+  } catch {
+    return null;
+  }
   return {
     updatedBefore: match[1]!,
     delivered: Number(match[2]),
     seenAt: seenAt === undefined ? [] : seenAt.split(",").map(Number),
+    ...(pageToken === undefined ? {} : { pageToken }),
   };
 }
 
@@ -360,7 +367,15 @@ function nextListCursor(
   delivered: ReadonlyArray<ProviderChangeRequest>,
   /** A provider may consume malformed offset-paged rows that never appear in `delivered`. */
   cursorAdvance = delivered.length,
+  nextPageToken?: string,
 ): string | null {
+  if (nextPageToken !== undefined) {
+    const boundary = fetched.reduce(
+      (oldest, item) => (item.updatedAt < oldest ? item.updatedAt : oldest),
+      fetched[0]?.updatedAt ?? previous?.updatedBefore ?? "1970-01-01T00:00:00Z",
+    );
+    return `${boundary}|${(previous?.delivered ?? 0) + cursorAdvance}||${encodeURIComponent(nextPageToken)}`;
+  }
   if (fetched.length === 0) return null;
   // Taken from what the host answered rather than from what survived de-duplication: a slice can
   // be entirely rows already sent — a hundred change requests touched in the same second is one
@@ -1176,7 +1191,11 @@ export const make = Effect.gen(function* () {
               ...(cursor === undefined
                 ? {}
                 : {
-                    cursor: { updatedBefore: cursor.updatedBefore, delivered: cursor.delivered },
+                    cursor: {
+                      updatedBefore: cursor.updatedBefore,
+                      delivered: cursor.delivered,
+                      ...(cursor.pageToken === undefined ? {} : { pageToken: cursor.pageToken }),
+                    },
                   }),
             })
             .pipe(
@@ -1202,7 +1221,13 @@ export const make = Effect.gen(function* () {
                   truncated: page.truncated,
                   nextCursor:
                     page.continues && page.truncated
-                      ? nextListCursor(cursor, page.items, items, page.cursorAdvance)
+                      ? nextListCursor(
+                          cursor,
+                          page.items,
+                          items,
+                          page.cursorAdvance,
+                          page.nextPageToken,
+                        )
                       : null,
                 };
               }),

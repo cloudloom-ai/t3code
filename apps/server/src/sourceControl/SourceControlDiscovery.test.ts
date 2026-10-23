@@ -223,6 +223,12 @@ it.effect("reports implemented tools separately from locally available executabl
           auth: "unknown",
           account: Option.none(),
         },
+        {
+          kind: SourceControlProviderKind.make("cursor-origin"),
+          status: "missing",
+          auth: "unknown",
+          account: Option.none(),
+        },
       ],
     );
     const bitbucket = result.sourceControlProviders.find((item) => item.kind === "bitbucket");
@@ -256,6 +262,9 @@ it.effect("probes provider authentication without exposing token details", () =>
             }),
           ),
         );
+      }
+      if (input.command === "origin" && input.args[0] === "auth") {
+        return Effect.succeed(processOutput(encodeJson({ authenticated: true })));
       }
       if (input.command === "glab" && input.args.join(" ") === "auth status") {
         return Effect.succeed(
@@ -372,6 +381,12 @@ Logged in to gitlab.com as gitlab-user
           kind: SourceControlProviderKind.make("gitcafe"),
           auth: "authenticated",
           account: Option.some("cafe-user"),
+          detail: Option.none(),
+        },
+        {
+          kind: SourceControlProviderKind.make("cursor-origin"),
+          auth: "authenticated",
+          account: Option.none(),
           detail: Option.none(),
         },
       ],

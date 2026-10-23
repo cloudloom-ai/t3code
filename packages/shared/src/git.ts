@@ -152,6 +152,12 @@ export function normalizeGitRemoteUrl(value: string): string {
     try {
       const url = new URL(normalized);
       const repositorySegments = url.pathname.split("/").filter((segment) => segment.length > 0);
+      if (
+        url.hostname === "origin.cursor.com" &&
+        repositorySegments[0] === "git" &&
+        repositorySegments.length === 3
+      )
+        repositorySegments.shift();
       if (url.hostname && repositorySegments.length > 1) {
         return (
           azureDevOpsRepositoryKey(url.hostname, repositorySegments) ??
