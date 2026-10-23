@@ -83,6 +83,13 @@ export const definition = defineSourceControlClient({
     isChangeRequestInProjectRepository(KIND, identity, link),
   canReadChangeRequestOnHost: (identity, link) =>
     isChangeRequestOnProjectHost(KIND, identity, link),
-  isChangeRequestUrl: (url) => isChangeRequestPath(url, "/pull/"),
+  isChangeRequestUrl: (url) => {
+    try {
+      if (new URL(url).hostname === "cursor.com") return false;
+      return isChangeRequestPath(url, "/pull/");
+    } catch {
+      return false;
+    }
+  },
   settings,
 });

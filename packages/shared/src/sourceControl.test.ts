@@ -262,3 +262,11 @@ it("names nothing for a project with no remote to name it by", () => {
   expect(sourceControlRepositorySelector(null)).toBeNull();
   expect(sourceControlRepositorySelector({ provider: "github" })).toBeNull();
 });
+
+it("recognizes Cursor Origin HTTPS remotes", () => {
+  for (const url of [
+    "https://origin.cursor.com/acme/repo.git",
+    "https://origin.cursor.com/git/acme/repo.git",
+  ])
+    expect(detectSourceControlProviderFromRemoteUrl(url)?.kind).toBe("cursor-origin");
+});

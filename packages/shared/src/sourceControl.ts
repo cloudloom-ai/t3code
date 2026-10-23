@@ -116,6 +116,17 @@ export function resolveChangeRequestPresentation(
       return BITBUCKET_CHANGE_REQUEST_PRESENTATION;
     case "gitcafe":
       return GITCAFE_CHANGE_REQUEST_PRESENTATION;
+    case "cursor-origin":
+      return {
+        icon: "change-request",
+        providerName: "Cursor Origin",
+        shortName: "PR",
+        longName: "pull request",
+        pluralLongName: "pull requests",
+        providerLongName: "Cursor Origin pull request",
+        checkoutCommandExample: "origin pr checkout 123",
+        urlExample: "https://cursor.com/codebase/owner/repo/pull/42",
+      };
     default:
       return GENERIC_CHANGE_REQUEST_PRESENTATION;
   }
@@ -216,6 +227,14 @@ export function detectSourceControlProviderFromRemoteUrl(
     return null;
   }
   const hostname = parseHostName(host);
+
+  if (hostname === "origin.cursor.com") {
+    return {
+      kind: SourceControlProviderKind.make("cursor-origin"),
+      name: "Cursor Origin",
+      baseUrl: "https://origin.cursor.com",
+    };
+  }
 
   if (isGitCafeHost(hostname)) {
     return {

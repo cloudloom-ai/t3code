@@ -188,3 +188,11 @@ describe("changeRequestUrlFor", () => {
     });
   });
 });
+
+it("maps Cursor browser links to the Origin git host", () => {
+  expect(parseChangeRequestUrl("https://cursor.com/codebase/acme/repo/pull/17")).toEqual({
+    host: "origin.cursor.com",
+    repository: "acme/repo",
+    number: 17,
+  });
+});

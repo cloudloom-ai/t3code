@@ -1,3 +1,4 @@
+import * as Origin from "@t3tools/source-control-origin/client/definition";
 import * as AzureDevOps from "@t3tools/source-control-azure-devops/client/definition";
 import * as Bitbucket from "@t3tools/source-control-bitbucket/client/definition";
 import {
@@ -24,6 +25,7 @@ import * as GitLab from "@t3tools/source-control-gitlab/client/definition";
  */
 const BUILT_IN_SOURCE_CONTROL_CLIENTS = [
   GitHub.definition,
+  Origin.definition,
   GitLab.definition,
   GitCafe.definition,
   Forgejo.definition,

@@ -921,6 +921,57 @@ it.effect("uses a provider's raw cursor advance when it consumed malformed rows"
   }),
 );
 
+it.effect("round-trips opaque provider page tokens, including empty intermediate pages", () =>
+  Effect.gen(function* () {
+    const calls: Array<unknown> = [];
+    const tokens = ["next|/+%?= one", "last|/+%?= two"];
+    const service = yield* makeService({
+      projects: [
+        project({ id: "p1", title: "t3code", workspaceRoot: "/a", repository: "pingdotgg/t3code" }),
+      ],
+      providers: [
+        fakeProvider(SourceControlProviderKind.make("github"), {
+          listChangeRequests: (input) => {
+            calls.push(input.cursor);
+            if (calls.length === 1)
+              return Effect.succeed({
+                items: [changeRequest(1, "2026-07-02T00:00:00Z")],
+                truncated: true,
+                continues: true,
+                nextPageToken: tokens[0]!,
+              });
+            if (calls.length === 2)
+              return Effect.succeed({
+                items: [],
+                truncated: true,
+                continues: true,
+                nextPageToken: tokens[1]!,
+              });
+            return Effect.succeed({
+              items: [changeRequest(2, "2026-07-01T00:00:00Z")],
+              truncated: false,
+              continues: true,
+            });
+          },
+        }),
+      ],
+    });
+    const first = yield* service.list({ state: "open" });
+    const second = yield* service.list({ state: "open", cursors: first.nextCursors });
+    const third = yield* service.list({ state: "open", cursors: second.nextCursors });
+    assert.deepStrictEqual(calls, [
+      undefined,
+      { updatedBefore: "2026-07-02T00:00:00Z", delivered: 1, pageToken: tokens[0] },
+      { updatedBefore: "2026-07-02T00:00:00Z", delivered: 1, pageToken: tokens[1] },
+    ]);
+    assert.deepStrictEqual(
+      third.entries.map((entry) => entry.number),
+      [2],
+    );
+    assert.deepStrictEqual(third.nextCursors, {});
+  }),
+);
+
 it.effect("reads only the repositories it was asked to carry on with", () =>
   Effect.gen(function* () {
     const listed: string[] = [];

@@ -1,3 +1,4 @@
+import * as OriginDriver from "@t3tools/source-control-origin/server/driver";
 import * as AzureDevOpsCli from "@t3tools/source-control-azure-devops/server/AzureDevOpsCli";
 import * as AzureDevOpsPullRequestCli from "@t3tools/source-control-azure-devops/server/AzureDevOpsPullRequestCli";
 import * as AzureDevOpsDriver from "@t3tools/source-control-azure-devops/server/driver";
@@ -27,6 +28,7 @@ const drivers = [
   BitbucketDriver.driver,
   ForgejoDriver.driver,
   GitCafeDriver.driver,
+  OriginDriver.driver,
 ];
 
 export type BuiltInSourceControlDriversEnv =
